@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#f8fafc">
+    <title>Indian Polity - President & Vice-President</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg-main: #f8fafc; --bg-card: #ffffff; --primary: #2563eb; --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff; --text-dark: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0;
+            --green: #10b981; --green-light: #ecfdf5; --red: #ef4444; --red-light: #fef2f2;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08);
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-dark); min-height: 100dvh; font-size: 15px; line-height: 1.5; overflow-x: hidden; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        .hidden { display: none !important; }
+        .start-screen { position: fixed; inset: 0; background: var(--bg-main); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .start-card { width: 100%; max-width: 440px; background: var(--bg-card); border-radius: 24px; padding: 36px 28px; box-shadow: var(--shadow-lg); text-align: center; border: 1px solid var(--border-color); }
+        .brand-icon { width: 60px; height: 60px; background: var(--primary-light); color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px; }
+        .start-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+        .start-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+        .mode-btn { display: flex; align-items: center; gap: 16px; width: 100%; padding: 16px; background: #fff; border: 1.5px solid var(--border-color); border-radius: 16px; text-align: left; margin-bottom: 12px; transition: all 0.2s ease; }
+        .mode-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+        .mode-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .mode-icon.quiz { background: #dbeafe; color: #2563eb; }
+        .mode-icon.test { background: #d1fae5; color: #059669; }
+        .mode-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+        .mode-info-txt { font-size: 12px; color: var(--text-muted); }
+        .quiz-app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        .quiz-header { flex-shrink: 0; background: #fff; border-bottom: 1px solid var(--border-color); padding: 12px 18px; }
+        .quiz-header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .hdr-brand { font-weight: 700; font-size: 15px; }
+        .hdr-timer { padding: 6px 14px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 20px; font-family: monospace; font-weight: 700; color: var(--primary); }
+        .hdr-btn { width: 38px; height: 38px; border-radius: 10px; background: #fff; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
+        .quiz-main { flex: 1; overflow-y: auto; max-width: 900px; width: 100%; margin: 0 auto; padding: 24px 16px; }
+        .q-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px; box-shadow: var(--shadow-sm); }
+        .q-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .q-num-badge { padding: 5px 12px; background: var(--primary-light); color: var(--primary); border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .lang-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12px; font-weight: 600; background: #fff; display: inline-flex; align-items: center; gap: 6px; }
+        .q-text { font-size: 16px; font-weight: 600; line-height: 1.6; margin-bottom: 22px; white-space: pre-line; }
+        .opts { display: flex; flex-direction: column; gap: 11px; }
+        .opt { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: #fff; border: 1.5px solid var(--border-color); border-radius: 14px; cursor: pointer; transition: all 0.15s ease; }
+        .opt:hover:not(.locked) { border-color: var(--primary); background: #f8fafc; }
+        .opt.selected { border-color: var(--primary); background: var(--primary-light); }
+        .opt.correct { border-color: var(--green); background: var(--green-light); }
+        .opt.wrong { border-color: var(--red); background: var(--red-light); }
+        .opt.locked { cursor: default; }
+        .opt-letter { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
+        .opt.selected .opt-letter { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .opt.correct .opt-letter { background: var(--green); color: #fff; border-color: var(--green); }
+        .opt.wrong .opt-letter { background: var(--red); color: #fff; border-color: var(--red); }
+        .opt-text { flex: 1; font-weight: 600; }
+        .opt-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+        .opt.correct .opt-tag { background: var(--green); color: #fff; }
+        .opt.wrong .opt-tag { background: var(--red); color: #fff; }
+        .sol-box { margin-top: 20px; padding: 16px; background: #f8fafc; border-left: 4px solid var(--primary); border-radius: 12px; }
+        .sol-head { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--primary); margin-bottom: 8px; }
+        .quiz-nav { flex-shrink: 0; background: #fff; border-top: 1px solid var(--border-color); padding: 12px 18px; }
+        .quiz-nav-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .nav-btn { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; }
+        .nav-btn.prev { background: #fff; border: 1px solid var(--border-color); }
+        .nav-btn.prev:disabled { opacity: 0.4; cursor: not-allowed; }
+        .nav-btn.submit { background: var(--green-light); color: #065f46; border: 1px solid #a7f3d0; }
+        .nav-btn.next { background: var(--primary); color: #fff; }
+        .palette-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; display: none; }
+        .palette-overlay.open { display: block; }
+        .palette-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: min(340px, 85vw); background: #fff; z-index: 160; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.25s; }
+        .palette-drawer.open { transform: translateX(0); }
+        .pal-head { padding: 18px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
+        .pal-grid { flex: 1; overflow-y: auto; padding: 16px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-content: start; }
+        .pal-btn { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--border-color); background: #f8fafc; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+        .pal-btn.answered { background: var(--green); color: #fff; border-color: var(--green); }
+        .pal-btn.current { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 170; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { width: 100%; max-width: 420px; background: #fff; border-radius: 20px; padding: 28px; text-align: center; }
+        .modal-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0 22px; }
+        .modal-stat { background: #f8fafc; border-radius: 12px; padding: 14px; border: 1px solid var(--border-color); }
+        .modal-stat-num { font-size: 24px; font-weight: 800; }
+        .modal-btn { width: 100%; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .modal-btn.confirm { background: var(--primary); color: #fff; }
+        .modal-btn.cancel { background: #f1f5f9; }
+        .results-screen { position: fixed; inset: 0; background: var(--bg-main); z-index: 180; display: none; overflow-y: auto; padding: 30px 16px 60px; }
+        .results-screen.open { display: block; }
+        .results-box { max-width: 600px; margin: 0 auto; text-align: center; }
+        .res-score-card { background: #0f172a; color: #fff; border-radius: 20px; padding: 28px; margin: 20px 0; }
+        .res-score-val { font-size: 54px; font-weight: 800; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .res-item { background: #fff; border-radius: 14px; padding: 16px; border: 1px solid var(--border-color); }
+        .res-item-val { font-size: 22px; font-weight: 700; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 600; z-index: 300; opacity: 0; transition: all 0.25s; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="start-screen" id="startScreen">
+        <div class="start-card">
+            <div class="brand-icon"><i class="fas fa-landmark"></i></div>
+            <h1 class="start-title">Polity: President & VP</h1>
+            <p class="start-desc">Articles 52–73 & 63–71 (Executive Powers & Election)</p>
+            <button class="mode-btn" onclick="startApp('quiz')">
+                <div class="mode-icon quiz"><i class="fas fa-bolt"></i></div>
+                <div><div class="mode-name">Practice Mode</div><div class="mode-info-txt">Instant correct/wrong answer and explanations.</div></div>
+            </button>
+            <button class="mode-btn" onclick="startApp('test')">
+                <div class="mode-icon test"><i class="fas fa-clock"></i></div>
+                <div><div class="mode-name">Exam Mode</div><div class="mode-info-txt">Mock exam with timer and score summary.</div></div>
+            </button>
+        </div>
+    </div>
+
+    <div class="quiz-app hidden" id="quizApp">
+        <header class="quiz-header">
+            <div class="quiz-header-inner">
+                <button class="hdr-btn" onclick="openPalette()"><i class="fas fa-th-large"></i></button>
+                <div class="hdr-brand">Union Executive: President & Vice-President</div>
+                <div class="hdr-timer"><i class="fas fa-stopwatch"></i> <span id="timerText">00:00</span></div>
+            </div>
+        </header>
+
+        <main class="quiz-main" id="quizMain"></main>
+
+        <nav class="quiz-nav" id="quizNav">
+            <div class="quiz-nav-inner">
+                <button class="nav-btn prev" id="prevBtn" onclick="prevQuestion()"><i class="fas fa-arrow-left"></i> Previous</button>
+                <button class="nav-btn submit" onclick="openSubmitModal()"><i class="fas fa-paper-plane"></i> Submit</button>
+                <button class="nav-btn next" id="nextBtn" onclick="nextQuestion()"><span id="nextLabel">Next</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </nav>
+    </div>
+
+    <div class="palette-overlay" id="paletteOverlay" onclick="closePalette()"></div>
+    <aside class="palette-drawer" id="paletteDrawer">
+        <div class="pal-head"><span>Questions</span><button onclick="closePalette()"><i class="fas fa-times"></i></button></div>
+        <div class="pal-grid" id="paletteGrid"></div>
+    </aside>
+
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal-box">
+            <h3>Submit Test?</h3>
+            <div class="modal-stats-grid">
+                <div class="modal-stat"><div class="modal-stat-num" id="modalAttempted" style="color:var(--green)">0</div><div>Attempted</div></div>
+                <div class="modal-stat"><div class="modal-stat-num" id="modalUnattempted" style="color:var(--text-muted)">0</div><div>Unattempted</div></div>
+            </div>
+            <button class="modal-btn confirm" onclick="confirmSubmit()">Yes, Finish</button>
+            <button class="modal-btn cancel" onclick="closeSubmitModal()">Resume</button>
+        </div>
+    </div>
+
+    <div class="results-screen" id="resultsScreen"><div class="results-box" id="resultsInner"></div></div>
+    <div class="toast" id="toast"><span id="toastText"></span></div>
+
+    <script>
+        const QUESTIONS = [
+            {
+                e: "Who among the following does NOT participate in the election of the President of India?",
+                h: "निम्नलिखित में से कौन भारत के राष्ट्रपति के चुनाव में भाग नहीं लेता है?",
+                oEn: ["Elected members of Lok Sabha", "Elected members of Rajya Sabha", "Elected members of State Legislative Assemblies", "Nominated members of Rajya Sabha"],
+                oHi: ["लोकसभा के निर्वाचित सदस्य", "राज्यसभा के निर्वाचित सदस्य", "राज्य विधानसभाओं के निर्वाचित सदस्य", "राज्यसभा के मनोनीत सदस्य"],
+                a: 3,
+                sE: "Under Article 54, the electoral college consists only of elected members of both Houses of Parliament and elected members of State Legislative Assemblies (including Delhi and Puducherry). Nominated members do not participate.",
+                sH: "अनुच्छेद 54 के अनुसार, निर्वाचक मंडल में संसद के दोनों सदनों के निर्वाचित सदस्य और राज्यों की विधानसभाओं के निर्वाचित सदस्य ही शामिल होते हैं। मनोनीत सदस्य इसमें भाग नहीं लेते हैं।"
+            },
+            {
+                e: "Which Article of the Indian Constitution empowers the President to promulgate Ordinances during the recess of Parliament?",
+                h: "भारतीय संविधान का कौन सा अनुच्छेद संसद के विश्रांतिकाल में राष्ट्रपति को अध्यादेश प्रख्यापित करने की शक्ति देता है?",
+                oEn: ["Article 123", "Article 213", "Article 110", "Article 72"],
+                oHi: ["अनुच्छेद 123", "अनुच्छेद 213", "अनुच्छेद 110", "अनुच्छेद 72"],
+                a: 0,
+                sE: "Article 123 grants the President power to promulgate ordinances when either House of Parliament is not in session. Article 213 grants similar powers to the Governor.",
+                sH: "अनुच्छेद 123 राष्ट्रपति को अध्यादेश जारी करने की शक्ति देता है जब संसद का कोई भी सदन सत्र में न हो। राज्यपाल के लिए यह शक्ति अनुच्छेद 213 में है।"
+            },
+            {
+                e: "Who administers the oath of office to the President of India?",
+                h: "भारत के राष्ट्रपति को पद की शपथ कौन दिलाता है?",
+                oEn: ["The Vice-President", "The Prime Minister", "The Chief Justice of India", "The Speaker of Lok Sabha"],
+                oHi: ["उपराष्ट्रपति", "प्रधानमंत्री", "भारत के मुख्य न्यायाधीश", "लोकसभा अध्यक्ष"],
+                a: 2,
+                sE: "Under Article 60, the oath of office is administered by the Chief Justice of India, or in their absence, the senior-most judge of the Supreme Court.",
+                sH: "अनुच्छेद 60 के अनुसार, राष्ट्रपति को शपथ भारत के मुख्य न्यायाधीश (CJI) या उनकी अनुपस्थिति में उच्चतम न्यायालय के वरिष्ठतम न्यायाधीश द्वारा दिलाई जाती है।"
+            },
+            {
+                e: "An impeachment motion against the President can be initiated in which House of Parliament?",
+                h: "राष्ट्रपति के खिलाफ महाभियोग का प्रस्ताव संसद के किस सदन में शुरू किया जा सकता है?",
+                oEn: ["Only Lok Sabha", "Only Rajya Sabha", "Either House of Parliament", "Joint sitting of Parliament"],
+                oHi: ["केवल लोकसभा में", "केवल राज्यसभा में", "संसद के किसी भी सदन में", "संसद की संयुक्त बैठक में"],
+                a: 2,
+                sE: "Under Article 61, impeachment charges can be initiated in either House of Parliament provided a 14-day written notice signed by at least 1/4th of total members of that house is given.",
+                sH: "अनुच्छेद 61 के तहत महाभियोग की प्रक्रिया संसद के किसी भी सदन (लोकसभा या राज्यसभा) में शुरू की जा सकती है, जिसके लिए सदन के कम से कम 1/4 सदस्यों के हस्ताक्षर और 14 दिन की पूर्व सूचना आवश्यक है।"
+            },
+            {
+                e: "Who is the Ex-officio Chairman of the Rajya Sabha (Council of States)?",
+                h: "राज्यसभा (राज्यों की परिषद) का पदेन सभापति कौन होता है?",
+                oEn: ["The President", "The Vice-President", "The Speaker of Lok Sabha", "The Prime Minister"],
+                oHi: ["राष्ट्रपति", "उपराष्ट्रपति", "लोकसभा अध्यक्ष", "प्रधानमंत्री"],
+                a: 1,
+                sE: "According to Article 64 and Article 89(1), the Vice-President of India is the ex-officio Chairman of the Council of States.",
+                sH: "अनुच्छेद 64 और 89(1) के अनुसार भारत का उपराष्ट्रपति राज्यसभा का पदेन सभापति होता है।"
+            },
+            {
+                e: "What is the minimum age required to qualify for election as the Vice-President of India?",
+                h: "भारत के उपराष्ट्रपति के रूप में चुनाव के लिए न्यूनतम आयु क्या आवश्यक है?",
+                oEn: ["25 years", "30 years", "35 years", "40 years"],
+                oHi: ["25 वर्ष", "30 वर्ष", "35 वर्ष", "40 वर्ष"],
+                a: 2,
+                sE: "Under Article 66(3), a candidate must have completed the age of 35 years to be eligible for election as Vice-President (same as President).",
+                sH: "अनुच्छेद 66(3) के अनुसार उपराष्ट्रपति पद के उम्मीदवार की न्यूनतम आयु 35 वर्ष होनी चाहिए (राष्ट्रपति पद के समान)।"
+            },
+            {
+                e: "All doubts and disputes arising out of the election of the President or Vice-President are decided by:",
+                h: "राष्ट्रपति या उपराष्ट्रपति के चुनाव से जुड़े सभी संदेहों और विवादों का निर्णय किसके द्वारा किया जाता है?",
+                oEn: ["The Election Commission of India", "The Supreme Court of India", "A Joint Parliamentary Committee", "The Delhi High Court"],
+                oHi: ["भारत का निर्वाचन आयोग", "भारत का उच्चतम न्यायालय", "संयुक्त संसदीय समिति", "दिल्ली उच्च न्यायालय"],
+                a: 1,
+                sE: "Under Article 71, all doubts and disputes arising out of the election of a President or Vice-President are inquired into and decided exclusively by the Supreme Court, whose decision is final.",
+                sH: "अनुच्छेद 71 के तहत, राष्ट्रपति या उपराष्ट्रपति चुनाव से संबंधित विवादों की जांच और अंतिम फैसला केवल उच्चतम न्यायालय (Supreme Court) द्वारा किया जाता है।"
+            },
+            {
+                e: "Who participates in the election of the Vice-President of India?",
+                h: "भारत के उपराष्ट्रपति के चुनाव में कौन भाग लेता है?",
+                oEn: ["Only elected members of Lok Sabha and Rajya Sabha", "All members (elected & nominated) of Lok Sabha and Rajya Sabha", "Elected members of Parliament and State Assemblies", "All members of Parliament and State Legislative Councils"],
+                oHi: ["केवल लोकसभा और राज्यसभा के निर्वाचित सदस्य", "संसद के दोनों सदनों के सभी सदस्य (निर्वाचित और मनोनीत)", "संसद और राज्य विधानसभाओं के निर्वाचित सदस्य", "संसद और राज्य विधान परिषदों के सभी सदस्य"],
+                a: 1,
+                sE: "Under Article 66(1), the electoral college for the Vice-President consists of members of both Houses of Parliament (both elected and nominated). State assemblies do not participate.",
+                sH: "अनुच्छेद 66(1) के अनुसार उपराष्ट्रपति के निर्वाचक मंडल में संसद के दोनों सदनों के सभी सदस्य (निर्वाचित और मनोनीत दोनों) शामिल होते हैं। राज्य विधानसभाएं भाग नहीं लेती हैं।"
+            },
+            {
+                e: "The pardoning power of the President of India is detailed under which Article of the Constitution?",
+                h: "भारत के राष्ट्रपति की क्षमादान शक्ति संविधान के किस अनुच्छेद में वर्णित है?",
+                oEn: ["Article 71", "Article 72", "Article 74", "Article 75"],
+                oHi: ["अनुच्छेद 71", "अनुच्छेद 72", "अनुच्छेद 74", "अनुच्छेद 75"],
+                a: 1,
+                sE: "Article 72 gives the President the power to grant pardons, reprieves, respites or remissions of punishment or to suspend, remit or commute sentences.",
+                sH: "अनुच्छेद 72 के तहत राष्ट्रपति को क्षमादान, दंड के निलंबन, परिहार और लघुकरण की शक्तियां प्राप्त हैं।"
+            },
+            {
+                e: "A resolution for the removal of the Vice-President can only be introduced in:",
+                h: "उपराष्ट्रपति को हटाने का प्रस्ताव केवल किसमें पेश किया जा सकता है?",
+                oEn: ["Lok Sabha", "Rajya Sabha", "Either House of Parliament", "Supreme Court"],
+                oHi: ["लोकसभा", "राज्यसभा", "संसद के किसी भी सदन में", "उच्चतम न्यायालय"],
+                a: 1,
+                sE: "Under Article 67(b), a resolution for the removal of the Vice-President must originate exclusively in the Rajya Sabha and must give at least 14 days' notice.",
+                sH: "अनुच्छेद 67(b) के अनुसार उपराष्ट्रपति को हटाने का संकल्प केवल राज्यसभा में ही प्रस्तुत किया जा सकता है, जिसके लिए 14 दिनों की पूर्व सूचना आवश्यक है।"
+            },
+            {
+                e: "The President submits their resignation letter addressed to:",
+                h: "राष्ट्रपति अपना त्यागपत्र किसे संबोधित करके सौंपते हैं?",
+                oEn: ["The Chief Justice of India", "The Prime Minister", "The Vice-President", "The Speaker of Lok Sabha"],
+                oHi: ["भारत के मुख्य न्यायाधीश", "प्रधानमंत्री", "उपराष्ट्रपति", "लोकसभा अध्यक्ष"],
+                a: 2,
+                sE: "Under Article 56(1)(a), the President may, by writing under hand addressed to the Vice-President, resign from office.",
+                sH: "अनुच्छेद 56(1)(a) के तहत राष्ट्रपति अपना त्यागपत्र उपराष्ट्रपति को सौंपते हैं।"
+            },
+            {
+                e: "When the Vice-President acts as President, who presides over the meetings of the Rajya Sabha?",
+                h: "जब उपराष्ट्रपति कार्यवाहक राष्ट्रपति के रूप में कार्य करते हैं, तो राज्यसभा की बैठकों की अध्यक्षता कौन करता है?",
+                oEn: ["The Speaker of Lok Sabha", "The Deputy Chairman of Rajya Sabha", "A newly appointed interim Vice-President", "The Prime Minister"],
+                oHi: ["लोकसभा अध्यक्ष", "राज्यसभा के उपसभापति", "नवनियुक्त अंतरिम उपराष्ट्रपति", "प्रधानमंत्री"],
+                a: 1,
+                sE: "Under Article 91, when the Vice-President acts as President, they do not perform the duties of the Chairman of Rajya Sabha; those duties are performed by the Deputy Chairman of Rajya Sabha.",
+                sH: "अनुच्छेद 91 के अनुसार, जब उपराष्ट्रपति राष्ट्रपति के रूप में कार्य करते हैं, तो वे राज्यसभा के सभापति का कर्तव्य नहीं निभाते; राज्यसभा की अध्यक्षता उपसभापति करते हैं।"
+            },
+            {
+                e: "Under which Article does the President have the power to consult the Supreme Court on questions of law or fact?",
+                h: "किस अनुच्छेद के तहत राष्ट्रपति को कानून या तथ्य के प्रश्नों पर उच्चतम न्यायालय से परामर्श करने की शक्ति है?",
+                oEn: ["Article 129", "Article 136", "Article 143", "Article 148"],
+                oHi: ["अनुच्छेद 129", "अनुच्छेद 136", "अनुच्छेद 143", "अनुच्छेद 148"],
+                a: 2,
+                sE: "Article 143 provides advisory jurisdiction to the Supreme Court, allowing the President to seek its opinion on questions of public importance.",
+                sH: "अनुच्छेद 143 राष्ट्रपति को सार्वजनिक महत्व के कानूनी या तथ्यात्मक प्रश्नों पर उच्चतम न्यायालय से सलाह मांगने का अधिकार देता है।"
+            },
+            {
+                e: "What is the maximum period for which the Vice-President can act as President in case of a casual vacancy in the office of President?",
+                h: "राष्ट्रपति का पद रिक्त होने पर उपराष्ट्रपति अधिकतम कितनी अवधि के लिए राष्ट्रपति के रूप में कार्य कर सकते हैं?",
+                oEn: ["3 months", "6 months", "1 year", "Indefinitely until next election"],
+                oHi: ["3 माह", "6 माह", "1 वर्ष", "अगले चुनाव तक अनिश्चित काल के लिए"],
+                a: 1,
+                sE: "Under Article 62(2), an election to fill a vacancy caused by death, resignation, or removal must be held within 6 months; therefore, the VP can act as President for a maximum of 6 months.",
+                sH: "अनुच्छेद 62(2) के अनुसार राष्ट्रपति की रिक्ति को 6 महीने के भीतर चुनाव कराकर भरना अनिवार्य है, अतः उपराष्ट्रपति अधिकतम 6 महीने तक कार्यवाहक राष्ट्रपति रह सकते हैं।"
+            },
+            {
+                e: "Which constitutional amendment made it mandatory for the President to act in accordance with the advice of the Council of Ministers?",
+                h: "किस संविधान संशोधन ने राष्ट्रपति के लिए मंत्रिपरिषद की सलाह के अनुसार कार्य करना अनिवार्य बना दिया?",
+                oEn: ["24th Amendment Act, 1971", "42nd Amendment Act, 1976", "44th Amendment Act, 1978", "52nd Amendment Act, 1985"],
+                oHi: ["24वाँ संशोधन अधिनियम, 1971", "42वाँ संशोधन अधिनियम, 1976", "44वाँ संशोधन अधिनियम, 1978", "52वाँ संशोधन अधिनियम, 1985"],
+                a: 1,
+                sE: "The 42nd Amendment (1976) amended Article 74(1) to make cabinet advice binding. The 44th Amendment (1978) later added that the President may require reconsidering advice once.",
+                sH: "42वें संशोधन (1976) ने अनुच्छेद 74(1) में संशोधन कर सलाह को बाध्यकारी बनाया। बाद में 44वें संशोधन (1978) ने राष्ट्रपति को सलाह एक बार पुनर्विचार के लिए लौटाने का अधिकार दिया।"
+            },
+            {
+                e: "The executive power of the Union is vested in the President by which Article?",
+                h: "संघ की कार्यपालिका शक्ति किस अनुच्छेद द्वारा राष्ट्रपति में निहित की गई है?",
+                oEn: ["Article 52", "Article 53", "Article 54", "Article 55"],
+                oHi: ["अनुच्छेद 52", "अनुच्छेद 53", "अनुच्छेद 54", "अनुच्छेद 55"],
+                a: 1,
+                sE: "Article 53(1) states that the executive power of the Union shall be vested in the President and exercised directly or through subordinate officers.",
+                sH: "अनुच्छेद 53(1) के अनुसार संघ की कार्यपालिका शक्ति राष्ट्रपति में निहित होगी और वह इसका प्रयोग स्वयं या अधीनस्थ अधिकारियों के माध्यम से करेंगे।"
+            },
+            {
+                e: "Who among the following was elected President of India unopposed?",
+                h: "निम्नलिखित में से कौन भारत के निर्विरोध राष्ट्रपति चुने गए थे?",
+                oEn: ["Dr. Rajendra Prasad", "Dr. S. Radhakrishnan", "Neelam Sanjiva Reddy", "Dr. A.P.J. Abdul Kalam"],
+                oHi: ["डॉ. राजेंद्र प्रसाद", "डॉ. एस. राधाकृष्णन", "नीलम संजीव रेड्डी", "डॉ. ए.पी.जे. अब्दुल कलाम"],
+                a: 2,
+                sE: "Neelam Sanjiva Reddy was elected unopposed as the 6th President of India in 1977 after all other nomination papers were rejected or withdrawn.",
+                sH: "नीलम संजीव रेड्डी 1977 में भारत के छठे राष्ट्रपति के रूप में निर्विरोध चुने गए थे।"
+            },
+            {
+                e: "How many electors are required as proposers and seconders respectively for the nomination of a candidate for the office of Vice-President?",
+                h: "उपराष्ट्रपति पद के प्रत्याशी के नामांकन के लिए क्रमश: कितने प्रस्तावक और समर्थक निर्वाचकों की आवश्यकता होती है?",
+                oEn: ["50 proposers and 50 seconders", "20 proposers and 20 seconders", "10 proposers and 10 seconders", "25 proposers and 25 seconders"],
+                oHi: ["50 प्रस्तावक और 50 समर्थक", "20 प्रस्तावक और 20 समर्थक", "10 प्रस्तावक और 10 समर्थक", "25 प्रस्तावक और 25 समर्थक"],
+                a: 1,
+                sE: "For the Vice-Presidential election, nomination requires at least 20 electors as proposers and 20 as seconders. (For President, it is 50 proposers and 50 seconders).",
+                sH: "उपराष्ट्रपति चुनाव नामांकन के लिए कम से कम 20 प्रस्तावक और 20 समर्थक आवश्यक होते हैं। (राष्ट्रपति पद के लिए यह संख्या 50 और 50 है)।"
+            },
+            {
+                e: "The 'Pocket Veto' of the Indian President is described by which of the following characteristics?",
+                h: "भारतीय राष्ट्रपति के 'पॉकेट वीटो' की विशेषता निम्नलिखित में से क्या है?",
+                oEn: ["Returning the bill within 14 days", "Indefinitely keeping the bill pending without giving or withholding assent", "Rejecting the bill completely on cabinet advice", "Withholding assent only for state bills"],
+                oHi: ["14 दिनों के भीतर विधेयक को वापस लौटाना", "सहमति दिए बिना या अस्वीकार किए बिना विधेयक को अनिश्चित काल के लिए लंबित रखना", "मंत्रिमंडल की सलाह पर विधेयक को पूरी तरह खारिज करना", "केवल राज्य विधेयकों पर सहमति रोकना"],
+                a: 1,
+                sE: "Under Article 111, since the Constitution does not prescribe any time limit within which the President must declare assent, the President can keep a bill pending indefinitely (known as Pocket Veto).",
+                sH: "भारतीय संविधान अनुच्छेद 111 के तहत राष्ट्रपति को विधेयक पर निर्णय लेने की कोई निश्चित समय-सीमा नहीं देता, इसलिए वे इसे अनिश्चित काल तक लंबित रख सकते हैं (पॉकेट वीटो)।"
+            },
+            {
+                e: "Who was the only Chief Justice of India to act as the President of India?",
+                h: "भारत के एकमात्र मुख्य न्यायाधीश कौन थे जिन्होंने भारत के कार्यवाहक राष्ट्रपति के रूप में कार्य किया?",
+                oEn: ["Justice P.N. Bhagwati", "Justice M. Hidayatullah", "Justice K. Subba Rao", "Justice H.J. Kania"],
+                oHi: ["न्यायमूर्ति पी.एन. भगवती", "न्यायमूर्ति एम. हिदायतुल्लाह", "न्यायमूर्ति के. सुब्बा राव", "न्यायमूर्ति एच.जे. कानिया"],
+                a: 1,
+                sE: "In 1969, following the death of President Zakir Husain and resignation of VP V.V. Giri, Chief Justice M. Hidayatullah acted as President under the President (Discharge of Functions) Act, 1969.",
+                sH: "1969 में राष्ट्रपति जाकिर हुसैन के निधन और उपराष्ट्रपति वी.वी. गिरि के इस्तीफे के बाद मुख्य न्यायाधीश एम. हिदायतुल्लाह ने कार्यवाहक राष्ट्रपति का पद संभाला था।"
+            },
+            {
+                e: "What majority is required in both Houses of Parliament to pass an impeachment resolution against the President?",
+                h: "राष्ट्रपति के विरुद्ध महाभियोग प्रस्ताव पारित करने के लिए संसद के दोनों सदनों में किस बहुमत की आवश्यकता होती है?",
+                oEn: ["Simple majority of members present and voting", "Majority of not less than two-thirds of members present and voting", "Majority of not less than two-thirds of the total membership of the House", "Absolute majority of total membership"],
+                oHi: ["उपस्थित और मतदान करने वाले सदस्यों का साधारण बहुमत", "उपस्थित और मतदान करने वाले सदस्यों का कम से कम दो-तिहाई बहुमत", "सदन की कुल सदस्य संख्या का कम से कम दो-तिहाई बहुमत", "कुल सदस्य संख्या का पूर्ण बहुमत"],
+                a: 2,
+                sE: "Under Article 61, an impeachment resolution must be passed by a majority of not less than two-thirds of the total membership of each house.",
+                sH: "अनुच्छेद 61 के तहत महाभियोग प्रस्ताव को प्रत्येक सदन की 'कुल सदस्य संख्या के कम से कम दो-तिहाई' के विशेष बहुमत से पारित होना चाहिए।"
+            },
+            {
+                e: "Which Article specifies that there shall be a Vice-President of India?",
+                h: "कौन सा अनुच्छेद निर्दिष्ट करता है कि भारत का एक उपराष्ट्रपति होगा?",
+                oEn: ["Article 60", "Article 62", "Article 63", "Article 65"],
+                oHi: ["अनुच्छेद 60", "अनुच्छेद 62", "अनुच्छेद 63", "अनुच्छेद 65"],
+                a: 2,
+                sE: "Article 63 of the Indian Constitution states: 'There shall be a Vice-President of India.'",
+                sH: "भारतीय संविधान के अनुच्छेद 63 में उल्लेख है कि 'भारत का एक उपराष्ट्रपति होगा।'"
+            },
+            {
+                e: "In case of casual vacancies in both the offices of President and Vice-President, who discharges the functions of the President?",
+                h: "यदि राष्ट्रपति और उपराष्ट्रपति दोनों के पद रिक्त हो जाएं, तो राष्ट्रपति के कार्यों का निर्वहन कौन करता है?",
+                oEn: ["The Prime Minister", "The Speaker of Lok Sabha", "The Chief Justice of India", "The senior-most Governor"],
+                oHi: ["प्रधानमंत्री", "लोकसभा अध्यक्ष", "भारत के मुख्य न्यायाधीश", "वरिष्ठतम राज्यपाल"],
+                a: 2,
+                sE: "Under the President (Discharge of Functions) Act, 1969, if both offices are vacant, the Chief Justice of India (or senior-most judge of the Supreme Court) acts as President.",
+                sH: "राष्ट्रपति (कार्यों का निर्वहन) अधिनियम, 1969 के अनुसार, दोनों पद रिक्त होने पर भारत के मुख्य न्यायाधीश (CJI) राष्ट्रपति पद का निर्वहन करते हैं।"
+            },
+            {
+                e: "Which of the following powers is NOT enjoyed by the President of India in relation to Money Bills?",
+                h: "धन विधेयकों के संबंध में निम्नलिखित में से कौन सी शक्ति भारत के राष्ट्रपति को प्राप्त नहीं है?",
+                oEn: ["Giving assent to the bill", "Withholding assent to the bill", "Returning the bill for reconsideration of Parliament", "Recommending introduction of the bill"],
+                oHi: ["विधेयक को सहमति देना", "विधेयक पर सहमति रोकना", "विधेयक को संसद के पुनर्विचार के लिए लौटाना", "विधेयक पेश करने की सिफारिश करना"],
+                a: 2,
+                sE: "Under Article 111, the President cannot return a Money Bill to Parliament for reconsideration. They must either give assent or withhold assent.",
+                sH: "अनुच्छेद 111 के तहत राष्ट्रपति धन विधेयक को पुनर्विचार के लिए वापस नहीं भेज सकते हैं। वे या तो स्वीकृति देते हैं या रोक सकते हैं।"
+            },
+            {
+                e: "How is the value of the vote of an MLA calculated in the Presidential election?",
+                h: "राष्ट्रपति चुनाव में एक विधायक (MLA) के मत का मूल्य कैसे निर्धारित होता है?",
+                oEn: ["(State Population / Total Elected MLAs) × 100", "(State Population / Total Elected MLAs) ÷ 1000", "(Total MP Votes / Total MLA Seats) ÷ 100", "(State Population / Total MPs of State) ÷ 1000"],
+                oHi: ["(राज्य की जनसंख्या / कुल निर्वाचित विधायक) × 100", "(राज्य की जनसंख्या / कुल निर्वाचित विधायक) ÷ 1000", "(कुल सांसद मत / कुल विधायक सीटें) ÷ 100", "(राज्य की जनसंख्या / राज्य के कुल सांसद) ÷ 1000"],
+                a: 1,
+                sE: "Under Article 55, Vote Value of an MLA = (Total Population of the State based on 1971 Census / Total elected members of Legislative Assembly) × (1/1000).",
+                sH: "अनुच्छेद 55 के अनुसार, MLA का मत मूल्य = (राज्य की कुल जनसंख्या / विधानसभा के कुल निर्वाचित सदस्य) ÷ 1000 होता है।"
+            },
+            {
+                e: "Under Article 78, whose constitutional duty is it to communicate to the President all decisions of the Council of Ministers?",
+                h: "अनुच्छेद 78 के तहत मंत्रिपरिषद के सभी निर्णयों से राष्ट्रपति को अवगत कराना किसका संवैधानिक कर्तव्य है?",
+                oEn: ["The Home Minister", "The Cabinet Secretary", "The Prime Minister", "The Law Minister"],
+                oHi: ["गृह मंत्री", "कैबिनेट सचिव", "प्रधानमंत्री", "कानून मंत्री"],
+                a: 2,
+                sE: "Article 78 lays down the duties of the Prime Minister to furnish information and communicate all decisions of the Council of Ministers to the President.",
+                sH: "अनुच्छेद 78 के तहत मंत्रिपरिषद के सभी प्रशासनिक निर्णयों और विधान प्रस्तावों की सूचना राष्ट्रपति को देना प्रधानमंत्री का कर्तव्य है।"
+            },
+            {
+                e: "Who administers the oath of office to the Vice-President of India?",
+                h: "भारत के उपराष्ट्रपति को पद की शपथ कौन दिलाता है?",
+                oEn: ["The Chief Justice of India", "The President (or person appointed by them)", "The Speaker of Lok Sabha", "The Attorney General"],
+                oHi: ["भारत के मुख्य न्यायाधीश", "राष्ट्रपति (या उनके द्वारा नियुक्त व्यक्ति)", "लोकसभा अध्यक्ष", "महान्यायवादी"],
+                a: 1,
+                sE: "Under Article 69, the oath of office to the Vice-President is administered by the President or some person appointed on that behalf by them.",
+                sH: "अनुच्छेद 69 के अनुसार उपराष्ट्रपति को शपथ राष्ट्रपति या उनके द्वारा इस कार्य के लिए नियुक्त व्यक्ति द्वारा दिलाई जाती है।"
+            },
+            {
+                e: "Can an ordinance promulgated by the President amend the Fundamental Rights enshrined in the Constitution?",
+                h: "क्या राष्ट्रपति द्वारा प्रख्यापित अध्यादेश संविधान में निहित मौलिक अधिकारों में संशोधन कर सकता है?",
+                oEn: ["Yes, unconditionally", "Yes, during a National Emergency", "No, an ordinance has the same limitations as an Act of Parliament and cannot amend the Constitution", "Only with ratification by half of the states"],
+                oHi: ["हाँ, बिना किसी शर्त के", "हाँ, राष्ट्रीय आपातकाल के दौरान", "नहीं, अध्यादेश की सीमाएं संसद के कानून के समान हैं और यह संविधान संशोधन नहीं कर सकता", "केवल आधे राज्यों के अनुसमर्थन से"],
+                a: 2,
+                sE: "Under Article 123(3), an ordinance cannot violate Fundamental Rights or amend the Constitution, as its legislative scope is identical to ordinary acts of Parliament.",
+                sH: "अनुच्छेद 123(3) के अनुसार अध्यादेश की सीमा वही है जो संसद द्वारा बनाए गए सामान्य कानून की होती है; यह संविधान में संशोधन नहीं कर सकता और न ही मौलिक अधिकारों का हनन कर सकता है।"
+            },
+            {
+                e: "Which Article of the Constitution deals with the qualification requirements for being elected as President of India?",
+                h: "संविधान का कौन सा अनुच्छेद भारत के राष्ट्रपति के रूप में चुने जाने की योग्यता शर्तों से संबंधित है?",
+                oEn: ["Article 56", "Article 57", "Article 58", "Article 59"],
+                oHi: ["अनुच्छेद 56", "अनुच्छेद 57", "अनुच्छेद 58", "अनुच्छेद 59"],
+                a: 2,
+                sE: "Article 58 details qualifications for President: must be an Indian citizen, completed 35 years of age, and qualified for election as a member of Lok Sabha.",
+                sH: "अनुच्छेद 58 राष्ट्रपति पद के लिए योग्यताओं का प्रावधान करता है (जैसे नागरिकता, न्यूनतम 35 वर्ष की आयु और लोकसभा सदस्य चुने जाने की पात्रता)।"
+            },
+            {
+                e: "If the election of a President is declared void by the Supreme Court, what is the legal status of the acts done by them prior to that decision?",
+                h: "यदि उच्चतम न्यायालय द्वारा राष्ट्रपति के चुनाव को शून्य (अवैध) घोषित कर दिया जाता है, तो उस निर्णय से पहले उनके द्वारा किए गए कार्यों की कानूनी स्थिति क्या होती है?",
+                oEn: ["All previous acts become completely void and null", "Acts done prior to the date of decision are not invalidated", "The Parliament must re-ratify all those acts within 30 days", "The acts remain valid only with cabinet approval"],
+                oHi: ["पूर्व के सभी कार्य पूरी तरह से अमान्य हो जाते हैं", "निर्णय की तिथि से पहले किए गए कार्य अमान्य नहीं ठहराए जाते", "संसद को 30 दिनों के भीतर उन सभी कार्यों को पुनः पारित करना होता है", "वे कार्य केवल मंत्रिमंडल की मंजूरी से मान्य रहते हैं"],
+                a: 1,
+                sE: "Under Article 71(2), acts done by the President in the exercise and performance of the powers and duties of the office are not invalidated by reason of the Supreme Court declaring the election void.",
+                sH: "अनुच्छेद 71(2) के अनुसार यदि राष्ट्रपति का चुनाव अवैध घोषित हो जाए, तब भी निर्णय आने से पहले राष्ट्रपति के रूप में किए गए कार्य अमान्य नहीं होते हैं।"
+            }
+        ];
+
+        const state = {
+            current: 0,
+            answers: new Array(QUESTIONS.length).fill(null),
+            locked: new Array(QUESTIONS.length).fill(false),
+            mode: 'test',
+            lang: 'hi',
+            startTime: null,
+            timerInterval: null,
+            elapsed: 0
+        };
+
+        function $(id) { return document.getElementById(id); }
+
+        function toast(msg) {
+            const t = $('toast');
+            $('toastText').textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            return String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+        }
+
+        function startApp(mode) {
+            state.mode = mode;
+            $('startScreen').classList.add('hidden');
+            $('quizApp').classList.remove('hidden');
+            state.startTime = Date.now();
+            state.timerInterval = setInterval(() => {
+                state.elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+                $('timerText').textContent = formatTime(state.elapsed);
+            }, 1000);
+            renderQuestion();
+            buildPalette();
+        }
+
+        function toggleLang() {
+            state.lang = state.lang === 'en' ? 'hi' : 'en';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const i = state.current;
+            const q = QUESTIONS[i];
+            const isQuiz = state.mode === 'quiz';
+            const locked = state.locked[i];
+            const userAns = state.answers[i];
+            const qTxt = state.lang === 'en' ? q.e : q.h;
+            const opts = state.lang === 'en' ? q.oEn : q.oHi;
+
+            let optsHtml = '';
+            opts.forEach((opt, idx) => {
+                let cls = '', tag = '';
+                if (isQuiz && locked) {
+                    if (idx === q.a) {
+                        cls = 'correct';
+                        tag = '<span class="opt-tag">Correct</span>';
+                    }
+                    if (userAns === idx && idx !== q.a) {
+                        cls = 'wrong';
+                        tag = '<span class="opt-tag">Your Ans</span>';
+                    }
+                } else if (userAns === idx) {
+                    cls = 'selected';
+                }
+                optsHtml += `
+                    <div class="opt ${cls} ${locked ? 'locked' : ''}" onclick="selectOption(${idx})">
+                        <div class="opt-letter">${String.fromCharCode(65 + idx)}</div>
+                        <div class="opt-text">${opt}</div>
+                        ${tag}
+                    </div>
+                `;
+            });
+
+            const solTxt = state.lang === 'en' ? q.sE : q.sH;
+            let solHtml = (isQuiz && locked) ? `
+                <div class="sol-box">
+                    <div class="sol-head"><i class="fas fa-lightbulb"></i> Explanation</div>
+                    <div style="white-space: pre-line;">${solTxt}</div>
+                </div>
+            ` : '';
+
+            $('quizMain').innerHTML = `
+                <div class="q-card">
+                    <div class="q-top">
+                        <div class="q-num-badge">Question ${i + 1} of ${QUESTIONS.length}</div>
+                        <button class="lang-btn" onclick="toggleLang()">
+                            <i class="fas fa-language"></i> ${state.lang === 'en' ? 'हिन्दी' : 'English'}
+                        </button>
+                    </div>
+                    <div class="q-text">${qTxt}</div>
+                    <div class="opts">${optsHtml}</div>
+                    ${solHtml}
+                </div>
+            `;
+
+            $('prevBtn').disabled = i === 0;
+            $('nextLabel').textContent = i === QUESTIONS.length - 1 ? 'Finish' : 'Next';
+            updatePaletteGrid();
+        }
+
+        function selectOption(idx) {
+            if (state.mode === 'quiz' && state.locked[state.current]) return;
+            state.answers[state.current] = idx;
+            if (state.mode === 'quiz') {
+                state.locked[state.current] = true;
+                if (idx === QUESTIONS[state.current].a) {
+                    toast('Correct! 🎉');
+                } else {
+                    toast('Incorrect');
+                }
+            }
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (state.current > 0) {
+                state.current--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (state.current < QUESTIONS.length - 1) {
+                state.current++;
+                renderQuestion();
+            } else {
+                openSubmitModal();
+            }
+        }
+
+        function buildPalette() {
+            const grid = $('paletteGrid');
+            grid.innerHTML = '';
+            QUESTIONS.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'pal-btn';
+                btn.id = 'pal-' + i;
+                btn.textContent = i + 1;
+                btn.onclick = () => {
+                    state.current = i;
+                    closePalette();
+                    renderQuestion();
+                };
+                grid.appendChild(btn);
+            });
+            updatePaletteGrid();
+        }
+
+        function updatePaletteGrid() {
+            QUESTIONS.forEach((_, i) => {
+                const btn = $('pal-' + i);
+                if (!btn) return;
+                btn.className = 'pal-btn';
+                if (i === state.current) btn.classList.add('current');
+                if (state.answers[i] !== null) btn.classList.add('answered');
+            });
+        }
+
+        function openPalette() {
+            $('paletteDrawer').classList.add('open');
+            $('paletteOverlay').classList.add('open');
+        }
+
+        function closePalette() {
+            $('paletteDrawer').classList.remove('open');
+            $('paletteOverlay').classList.remove('open');
+        }
+
+        function openSubmitModal() {
+            const ans = state.answers.filter(a => a !== null).length;
+            $('modalAttempted').textContent = ans;
+            $('modalUnattempted').textContent = QUESTIONS.length - ans;
+            $('submitModal').classList.add('open');
+        }
+
+        function closeSubmitModal() {
+            $('submitModal').classList.remove('open');
+        }
+
+        function confirmSubmit() {
+            closeSubmitModal();
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            let correct = 0, wrong = 0;
+            state.answers.forEach((ans, i) => {
+                if (ans !== null) {
+                    if (ans === QUESTIONS[i].a) correct++;
+                    else wrong++;
+                }
+            });
+            $('resultsInner').innerHTML = `
+                <h2>Test Completed!</h2>
+                <p style="color:var(--text-muted);margin:8px 0;">Total Time: ${formatTime(state.elapsed)}</p>
+                <div class="res-score-card">
+                    <div class="res-score-val">${correct} / ${QUESTIONS.length}</div>
+                    <div>Score</div>
+                </div>
+                <div class="res-grid">
+                    <div class="res-item"><div class="res-item-val" style="color:var(--green)">${correct}</div><div>Correct</div></div>
+                    <div class="res-item"><div class="res-item-val" style="color:var(--red)">${wrong}</div><div>Wrong</div></div>
+                </div>
+                <button class="modal-btn confirm" onclick="location.reload()">Re-attempt</button>
+            `;
+            $('resultsScreen').classList.add('open');
+        }
+    </script>
+</body>
+</html>
